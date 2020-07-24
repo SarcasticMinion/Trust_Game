@@ -1,15 +1,16 @@
 from trust_basics import trust_result
+import copy
 
-class BaseCharacter():
+DET_PLAY_BOOK = [1, 0, 1, 1]
+
+class Character():
 
     changing_strategies = [
         'copycat',
         'grudger',
         'detective'
     ]
-    det_play_book = iter([
-        1, 0, 1, 1
-    ])
+
 
     def __init__(self, strategy, action=None, start_score=0):
 
@@ -17,6 +18,10 @@ class BaseCharacter():
         self.score = start_score
         self.play_tally = []
         self.action = action
+        self.player_id = None
+        if self.strategy == 'detective':
+            self.det_play_book = iter(DET_PLAY_BOOK)
+
 
     def play(self):
         if self.strategy in self.changing_strategies:
@@ -57,27 +62,47 @@ class BaseCharacter():
                 else:
                     return self.play_tally[-1]
 
-# class CopyCat(BaseCharacter):
-
-#     def play(self):
-#         self.play_tally.append(self.action)
-#         if self.play_tally == []:
-#             return self.action
-#         else
-#             return
+    def reset(self):
+        self.play_tally = []
+        if self.strategy == 'detective':
+            self.det_play_book = iter(DET_PLAY_BOOK)
 
 
 if __name__ == '__main__':
 
-    type_A = BaseCharacter('cheat', action=0)
-    type_B = BaseCharacter('cooperate', action=1)
+    type_A = Character('cheat', action=0)
+    type_B = Character('cooperate', action=1)
+    type_C = Character('copycat')
+    type_D = Character('grudger')
+    type_E = Character('detective')
 
-    action_tally = []
+    # action_tally = []
+    # score1_tally = []
+    # score2_tally = []
+    print(type_A.strategy, type_B.strategy)
+    for i in range(10):
+        type_A.round(type_B)
+        print(type_A.score, type_B.score)
 
-    for i in range(4):
-        action_tally.append(type_A.round(type_B)[1])
-        # print('detective:', type_A.action)
-        # print('grudger:', type_B.action)
-    print(action_tally)
+    type_A.reset()
+    type_B.reset()
+
+    print(type_A.strategy, type_C.strategy)
+
+    for i in range(10):
+        type_A.round(type_C)
+        print(type_A.score, type_C.score)
+
+    print(type_B.strategy, type_C.strategy)
+    type_B.reset()
+    type_C.reset()
+
+    for i in range(10):
+        type_B.round(type_C)
+        print(type_B.score, type_C.score)
+    type_C.reset()
+    type_B.reset()
+    # print(list(zip(action_tally, type_A.play_tally)))
+    # print(list(zip(score1_tally, score2_tally)))
     # print(type_A.score)
     # print(type_B.score)
