@@ -1,5 +1,4 @@
 from trust_basics import trust_result
-import copy
 
 DET_PLAY_BOOK = [1, 0, 1, 1]
 
@@ -11,7 +10,6 @@ class Character():
         'detective'
     ]
 
-
     def __init__(self, strategy, action=None, start_score=0):
 
         self.strategy = strategy
@@ -21,7 +19,6 @@ class Character():
         self.player_id = None
         if self.strategy == 'detective':
             self.det_play_book = iter(DET_PLAY_BOOK)
-
 
     def play(self):
         if self.strategy in self.changing_strategies:
@@ -67,6 +64,16 @@ class Character():
         if self.strategy == 'detective':
             self.det_play_book = iter(DET_PLAY_BOOK)
 
+    def born_again(self):
+        self.score = 0
+
+    def to_dict(self):
+        return {
+            'id': self.player_id,
+            'strategy': self.strategy,
+            'score': self.score
+        }
+
 
 if __name__ == '__main__':
 
@@ -76,9 +83,6 @@ if __name__ == '__main__':
     type_D = Character('grudger')
     type_E = Character('detective')
 
-    # action_tally = []
-    # score1_tally = []
-    # score2_tally = []
     print(type_A.strategy, type_B.strategy)
     for i in range(10):
         type_A.round(type_B)
@@ -102,7 +106,3 @@ if __name__ == '__main__':
         print(type_B.score, type_C.score)
     type_C.reset()
     type_B.reset()
-    # print(list(zip(action_tally, type_A.play_tally)))
-    # print(list(zip(score1_tally, score2_tally)))
-    # print(type_A.score)
-    # print(type_B.score)
