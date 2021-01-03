@@ -1,5 +1,5 @@
 from trust_basics import trust_result
-
+import random
 DET_PLAY_BOOK = [1, 0, 1, 1]
 
 class Character():
@@ -7,10 +7,13 @@ class Character():
     changing_strategies = [
         'copycat',
         'grudger',
-        'detective'
+        'detective',
+        'copykitten',
+        'simpleton',
+        'random'
     ]
 
-    def __init__(self, strategy, action=None, start_score=0):
+    def __init__(self, strategy, action=None, start_score=0, payoff=2):
 
         self.strategy = strategy
         self.score = start_score
@@ -19,16 +22,23 @@ class Character():
         self.player_id = None
         if self.strategy == 'detective':
             self.det_play_book = iter(DET_PLAY_BOOK)
+        self.payoff = payoff
 
     def play(self):
         if self.strategy in self.changing_strategies:
             self.action = self.get_action()
         return self.action
 
-    def round(self, other):
+    def round(self, other, mistake):
         self_action = self.play()
         other_action = other.play()
-        results = trust_result(self_action, other_action)
+        r1 = random.random()
+        r2 = random.random()
+        if r1 <= mistake:
+            self_action = not self_action
+        if r2 <= mistake:
+            other_action = not other_action
+        results = trust_result(self_action, other_action, self.payoff)
 
         self.play_tally.append(other_action)
         other.play_tally.append(self_action)
@@ -58,6 +68,22 @@ class Character():
                     return 0
                 else:
                     return self.play_tally[-1]
+        if self.strategy == 'copykitten':
+            if self.play_tally == []:
+                return 1
+            elif len(self.play_tally) >= 2 and not any(self.play_tally[-2:]):
+                return 0
+            else:
+                return 1
+        if self.strategy == 'simpleton':
+            if self.play_tally == []:
+                return 1
+            elif self.play_tally[-1]:
+                return self.action
+            elif not self.play_tally[-1]:
+                return not self.action
+        if self.strategy == 'random':
+            return random.random() >= 0.5
 
     def reset(self):
         self.play_tally = []
